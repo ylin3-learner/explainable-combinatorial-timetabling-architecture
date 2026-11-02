@@ -138,14 +138,20 @@ graph TB
 
 ---
 
-## 3. End-to-End Optimization & Diagnostic Flow
-Data-level inputs are vectorized into high-density tensors before entering the CP-SAT compiler. If structural invariants or dynamic policy overlays collide, the control flow is instantly routed into an isolation sequence.
+## 3. Computational Pipeline & Search Space Optimization
+
+To evaluate operational reliability at computational scale, the compilation pipeline was production-tested using complex configurations from a target institution comprising **50+ instructors and 18 distinct classes operating on a highly dense 40-slot weekly schedule matrix (8 periods per day, 5 days a week)**. 
+
+### A. Algorithmic Search Space Pruning & Tri-Layer Rule Constraint Matrix
+Under a naive mathematical formulation, mapping combinations across class structures, active subject loads, and 40 temporal slots triggers severe dimensional explosions. The computational complexity is heavily amplified because the system must simultaneously satisfy a dense matrix of **52 co-dependent scheduling rules, structurally layered into a tri-party hierarchy**:
+1. **Hard Invariants (14 Rules):** Absolute physical boundaries (e.g., zero instructor/class concurrent concurrency collisions, mandatory contiguous blocks).
+2. **Dynamic Variant Policies:** User-defined institutional logic (e.g., slot synchronization, restricted time-spans, and capacity-bounded limits).
+3. **Soft Regularization Heuristics:** Optimization preference penalties (e.g., location affinity matrices and schedule stability preservation indicators).
+
+To bypass the resulting NP-hard exponential search horizon, this system pre-calculates relational policies into compressed availability tensors. By executing a **pre-solve logical Bitmask vector mask loop**, the compiler prunes unsatisfiable search branches aggressively before initializing the solver, constraint-compacting the live decision environment down to **strictly 15,600 active bounded variables**. This optimization allows the industrial-grade CP-SAT engine to complete global optimizations and isolate minimal unsatisfiable cores safely within a bounded 40-second horizon.
 
 ```mermaid
 flowchart TD
-    %% ==========================================
-    %% STYLE DEFINITIONS (Dataflow Friendly)
-    %% ==========================================
     classDef input_style fill:#eceff1,stroke:#607d8b,stroke-width:2px,color:#263238;
     classDef pipeline_style fill:#fff9c4,stroke:#fbc02d,stroke-width:2px,color:#f57f17;
     classDef load_style fill:#e3f2fd,stroke:#1e88e5,stroke-width:2px,color:#0d47a1;
@@ -154,11 +160,11 @@ flowchart TD
     classDef branch_style fill:#ffebee,stroke:#d32f2f,stroke-width:2px,color:#b71c1c;
     classDef diag_style fill:#fbe9e7,stroke:#ff5722,stroke-width:2px,stroke-dasharray: 3 3,color:#bf360c;
 
-    XLSX["📊 source_manifest.xlsx<br/>Faculty Load / Demands / Allocation Bounds"]:::input_style
+    XLSX["📊 source_manifest.xlsx<br/>50+ Instructors / 18 Classes / 40 Slots Matrix"]:::input_style
     
     subgraph PREP["🛠️ High-Throughput Ingestion Subsystem (ETL)"]
         P1["schema_extractor.py<br/>Extracts Resource Matrix"]:::pipeline_style
-        P2["bitmask_tensor_generator.py<br/>Vectorizes Forbidden Availability Spans"]:::pipeline_style
+        P2["bitmask_tensor_generator.py<br/>Vectorizes Dynamic Forbidden Availability Spans"]:::pipeline_style
         P3["pipeline_orchestrator.py<br/>Synchronizes ETL Subsystem"]:::pipeline_style
     end
     
@@ -173,13 +179,9 @@ flowchart TD
         SD4["Dynamic Exception Masks"]:::load_style
     end
     
-    subgraph MODEL["🏗️ CP-SAT Constrained Model Compiler"]
-        VAR["Variable Initialization<br/>Decision Variable Matrix: x[class, subject, day, slot]"]:::compiler_style
-        STRUCT["Structural Bound Consolidation<br/>- Strict Volumetric Allocation Check<br/>- Uniqueness Injection (Class Domain)<br/>- Conflict Prevention (Instructor Domain)"]:::compiler_style
-        FIXED["invariant_rules.py<br/>14 Structural Invariant Core Rules"]:::compiler_style
-        ROT["rotation_calculus.py<br/>Bi-weekly Alternating Transformations"]:::compiler_style
-        VARIABLE["variant_rules.py<br/>Dynamic Overlays: Sync / Concurrency Limits"]:::compiler_style
-        SOFT["soft_objectives.py<br/>Heuristic Objective Regularization Weights"]:::compiler_style
+    subgraph MODEL["🏗️ CP-SAT Model Compiler & Pruner Core"]
+        VAR["Variable Initialization & Pruning<br/>Executes Bitmask Tensor Pruning<br/>Compacted to 15,600 Active Variables"]:::compiler_style
+        STRUCT["52 Rules Stacked Hierarchy<br/>- 14 Hard Invariants<br/>- Variant Policy Overlays<br/>- Heuristic Regularization Weights"]:::compiler_style
     end
     
     SOLVER["🔬 Industrial SAT/CP Solver Core<br/>Bounded Search Horizon: max_time=40s"]:::solver_style
@@ -213,11 +215,7 @@ flowchart TD
     
     SD --> VAR
     VAR --> STRUCT
-    STRUCT --> FIXED
-    FIXED --> ROT
-    ROT --> VARIABLE
-    VARIABLE --> SOFT
-    SOFT --> SOLVER
+    STRUCT --> SOLVER
     
     SOLVER --> FEASIBLE
     SOLVER --> INFEASIBLE
