@@ -322,3 +322,34 @@ flowchart TD
 • Phase 2 (Exclusionary Subspace Isolation): Evaluates constraint deletion effects to mathematically isolate individual non-negotiable rule requirements.
 
 • Phase 4 (Pairwise Combinatorial Collision): Ranks and tests high-density policy tuples to capture multi-variable mutex lockouts efficiently.
+
+## 5. Field Validation & Domain Expert Feedback
+
+Beyond mathematical simulations, the configuration mechanics and the conflict-refinement pipeline were evaluated in an active institutional setting, incorporating hands-on field feedback from the academic affairs coordinator responsible for the organization's global timetabling.
+
+### A. Competitive Positioning & Human-in-the-Loop Integration
+When evaluated against existing institutional workflows and commercial alternatives, the expert categorized the systemic utility through a distinct three-tier operational lens:
+
+* **Visual Spreadsheets (e.g., STC):** Well-suited for direct visual manipulation and heuristic adjustments, but offers zero algorithmic feedback on whether a mutated arrangement remains mathematically satisfiable, or why a manual change triggers a system-wide failure state.
+* **Black-Box Commercial Automation (e.g., "Xinhe"):** Fully automated and feature-rich, but operates as an opaque black box. It produces structural schedules that administrators cannot inspect, modify, or debug at the raw data level; its output formats are highly rigid and counter-intuitive to human refinement.
+* **This System (Diagnostic Layer):** Deployed specifically at the point where scheduling policies are authored. It instantly determines whether a newly injected rule set is satisfiable, isolates the minimal unsatisfiable subset (MUS) if constraints collide, and identifies exactly *which* boundary should be relaxed and *why*.
+
+```mermaid
+graph LR
+    classDef workflow fill:#eceff1,stroke:#607d8b,stroke-width:2px,color:#263238;
+    classDef engine fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#e65100;
+    classDef human fill:#e3f2fd,stroke:#1e88e5,stroke-width:2px,color:#0d47a1;
+
+    STC["STC Spreadsheet<br/>(Visual Manipulation)"]:::workflow
+    SYS["This System<br/>(Real-Time Feasibility & MUS Diagnosis)"]:::engine
+    HUMAN["Human Coordinator<br/>(Defensible Relaxation Choice)"]:::human
+
+    STC -->|"Attempted Change"| SYS
+    SYS -->|"Extract Matrix Conflict"| HUMAN
+    HUMAN -->|"Applies Intuitive Override"| STC
+```
+
+### B. Methodological Scope Notice
+Rather than serving as a brute-force replacement for manual workflows, this tool functions as a real-time feasibility verification and root-cause diagnostic layer sitting alongside a human-driven, visually manipulated scheduling loop. 
+
+*Note: This single-informant, qualitative field observation serves as preliminary production-level feedback reflecting practical institutional validation, rather than an isolated, static synthetic benchmark evaluation.*
