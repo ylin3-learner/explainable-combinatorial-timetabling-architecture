@@ -136,6 +136,10 @@ graph TB
     EXPORT --> Data
 ```
 
+## 2.5 Real-World Deployment Constraints & Compliance
+
+To test the resilience of the XCP architecture under true institutional conditions, the engine was purposefully deployed and validated on legacy institutional hardware. For full details on hardware optimization and privacy compliance, please refer to the referenced documentation.
+
 ---
 
 ## 3. Computational Pipeline & Search Space Optimization
