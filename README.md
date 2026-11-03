@@ -4,6 +4,9 @@
 
 > **Notice:** The production source code, specific constraint heuristics, and underlying database schemas of this optimization system are hosted in a secure, private repository due to proprietary intellectual property protections and ongoing commercial deployment. This public repository functions exclusively as a high-level architectural specification, theoretical formalization, and methodology showcase for graduate school application portfolios. Unauthorized duplication, modification, or commercial exploitation of these designs is strictly prohibited.
 
+## 0. Operational Context & Production Deployment:
+This system was engineered and field-tested during my teaching practicum. To validate its real-world viability, the engine was deployed directly into the school's administrative workflow to generate the official master schedule for the current academic semester. Navigating local faculty constraints and dense resource limitations, the compiler successfully resolved all institutional hard invariants and generated a fully optimized, conflict-free timetable within its 40-second execution horizon.
+
 ---
 
 ## 1. Architectural Philosophy & The Core Challenge
